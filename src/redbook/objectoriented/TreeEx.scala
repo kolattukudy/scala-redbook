@@ -2,7 +2,7 @@ package redbook.objectoriented
 import BTreePrinter._
 
 import scala.reflect.ClassTag
-
+//https://github.com/TheDom/functional-programming-in-scala/tree/master/src/main/scala/com/dominikgruber/fpinscala
 sealed trait Tree[+A]
 case class Leaf[A](value: A) extends Tree[A]
 case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
