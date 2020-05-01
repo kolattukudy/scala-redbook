@@ -6,7 +6,7 @@ object Functionexercise extends App{
     if (n <= 0) accumulator
   else
       concattailrec(a, n-1, a+ accumulator)
-  print(concattailrec("hello",3, ""))
+ print(concattailrec("hello",3, ""))
 
 
 
