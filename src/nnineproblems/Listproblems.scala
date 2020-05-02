@@ -71,7 +71,52 @@ object Listproblems  extends App{
     case x::xs => reverseList(xs) ::: List(x)
 
   }
-
   println(reverseList(qlist))
 
+  def isPalindrome[A](l: List[A]):Boolean = l match {
+    case Nil => true //empty list
+    case x:: Nil => true // one element list
+    case _:: _ => l.head == l.last && isPalindrome(l.tail.init) //matchs head and tail
+  }                              //IN----------------------T
+                            //H -TAI---------------------------L
+  println ( isPalindrome(List("M","A","L","A","Y","A","L","A","M")))
+
+  def flatten(l: Any): List[Any] = l match {
+    case Nil => Nil //empty list
+    case x::xs =>  flatten(x)::: flatten(xs)
+    case x => List(x) //only one list
+  }
+
+  println(flatten(List(List(1, 1), 2, List(3, List(5, 8)))))
+
+  def flatten2[T](list: List[T]): List[T] = list match {
+    case Nil => Nil
+    case head :: tail => (head match {
+      case l: List[T] => flatten2(l)
+      case i => List(i)
+    }) ::: flatten2(tail)
+  }
+  println(flatten2(List(List(1, 1), 2, List(3, List(5, 8)))))
+
+
+  //Eliminate consecutive duplicates of list elements.
+  def compress[T](list: List[T]) : List[T] = list match {
+    case Nil => Nil
+    case h:: Nil => List(h)
+    case x:: xs  if (x==xs.head ) => compress(xs)
+    case x::xs => x:: compress(xs)
+
+  }
+  println(compress(List('a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e')))
+
+  //compress using foldRight
+  def fcompress[A](l: List[A]):List[A] = l.foldRight(List[A]()) {
+    case (e, ls) if (ls.isEmpty || ls.head != e) => e::ls
+    case (e, ls) => ls
+  }
+  println(fcompress(List('a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e')))
+
 }
+
+
+
