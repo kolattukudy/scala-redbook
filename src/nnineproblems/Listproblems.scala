@@ -1,5 +1,7 @@
 package nnineproblems
 
+import scala.annotation.tailrec
+
 
 object Listproblems  extends App {
 
@@ -28,9 +30,9 @@ object Listproblems  extends App {
    */
   def secondLast[A](l: List[A]): A = l match {
 
-    case x :: List(xs) => x
+    case x :: List(xs) => x // exit case when tail is composed of a list of one element then return the previous element head.
 
-    case x :: xs => secondLast(xs)
+    case x :: xs => secondLast(xs) //recurse
   }
 
   println(secondLast(qlist))
@@ -41,48 +43,87 @@ object Listproblems  extends App {
    */
 
 
-  def kthelement[A](k: Int, l: List[A]): A = k match {
+  def findKth[A](k:Int, l:List[A]):A = (k,l) match {
 
-    case 0 => l.head
-    case _ => kthelement(k - 1, l.tail)
+    case (0, h::_) => h // k 0 and list which has a head
+    case (k, _::tail) if k > 0 => findKth(k - 1, tail )// if k> 0 , recurse until k is 0, each time index is reduced by 1
+    case _ => throw new NoSuchElementException // empty list
 
   }
-
-  def findKth[A](k: Int, l: List[A]): A = (k, l) match {
-
-    case (0, h :: _) => h
-    case (k, _ :: tail) if k > 0 => findKth(k - 1, tail)
-    case _ => throw new NoSuchElementException
-  }
-
-  println(kthelement(0, qlist))
-
   println(findKth(0, qlist))
 
-
-  def lengthList[A](l: List[A]): Int = l match {
-    case Nil => 0
-    case x :: xs => 1 + lengthList(xs)
+  /**
+   *
+   * simple while loop
+    * @param l
+   * @tparam A
+   * @return
+   */
+  def listLoop[A](l:List[A]):List[A] = l match {
+    case Nil=> List()
+    case h::Nil => Nil
+    case h::tail => println("tail" + tail); listLoop(tail)
   }
 
-  println(lengthList(qlist))
+  println(listLoop(qlist))
+
+
+  /**
+   *
+   * Lenght of the list
+   * @tparam T
+   * @return
+   */
+
+
+  def length[T](list: List[T]) = {
+    @tailrec
+    def loop(list: List[T], res: Int): Int = list match {
+      case Nil => res
+      case head :: tail => loop(tail, res+1) //increment the res count
+    }
+
+    loop(list, 0)
+  }
+  println(qlist)
+  println(length(qlist))
+
+  /**
+   * Reverse a list
+   * @param l
+   * @tparam A
+   * @return
+   */
 
   def reverseList[A](l: List[A]): List[A] = l match {
-    case Nil => Nil
-    case x :: Nil => List(x)
-    case x :: xs => reverseList(xs) ::: List(x)
-
+    case Nil => Nil  //empty list
+    case x :: Nil => List(x) //one element list
+    case x :: xs => reverseList(xs) ::: List(x) /// recurse the tail and append to list of head
   }
-
   println(reverseList(qlist))
+
+  /**
+   *
+   * check is palindrome
+   * @param l
+   * @tparam A
+   * @return
+   */
 
   def isPalindrome[A](l: List[A]): Boolean = l match {
     case Nil => true //empty list
     case x :: Nil => true // one element list
-    case _ :: _ => l.head == l.last && isPalindrome(l.tail.init) //matchs head and tail
+    case _ :: _ => l.head == l.last && isPalindrome(l.tail.init) //matchs head and tail then recurse the init
   } //IN----------------------T
   //H -TAI---------------------------L
   println(isPalindrome(List("M", "A", "L", "A", "Y", "A", "L", "A", "M")))
+
+  /***
+   *
+   * flatten the list
+   * @param l
+   * @return
+   */
 
   def flatten(l: Any): List[Any] = l match {
     case Nil => Nil //empty list
@@ -92,23 +133,37 @@ object Listproblems  extends App {
 
   println(flatten(List(List(1, 1), 2, List(3, List(5, 8)))))
 
+  /***
+   * flattern another way
+   * @param list
+   * @tparam T
+   * @return
+   */
   def flatten2[T](list: List[T]): List[T] = list match {
-    case Nil => Nil
+    case Nil => Nil      //empty condition for exit
     case head :: tail => (head match {
-      case l: List[T] => flatten2(l)
-      case i => List(i)
-    }) ::: flatten2(tail)
+      case l: List[T] => flatten2(l)      // if head is a list recurse list
+      case i => List(i)           //if not a list create a list with heaad
+    }) ::: flatten2(tail) // append the head with recursed tail
   }
 
   println(flatten2(List(List(1, 1), 2, List(3, List(5, 8)))))
 
 
-  //Eliminate consecutive duplicates of list elements.
+
+  /***
+   * Eliminate consecutive duplicates of list elements.
+   *
+   * @param list
+   * @tparam T
+   * @return
+   */
   def compress[T](list: List[T]): List[T] = list match {
     case Nil => Nil
     case h :: Nil => List(h)
     case x :: xs if (x == xs.head) => compress(xs)
-    case x :: xs => x :: compress(xs)
+    case x :: xs => x :: compress(xs) //:: it is taken as one item, which results in a nested structure.
+                                      //:: prepends a single item whereas ::: prepends a complete list.
 
   }
 
@@ -123,17 +178,36 @@ object Listproblems  extends App {
 
   println(fcompress(List('a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e')))
 
+  /***
+   *
+   * Remove duplicates from a list
+   */
+  def remove(xs: List[Int]):List[Int]= {
+  def _remove(xs: List[Int], acc: List[Int] = Nil): List[Int] = xs match {
+    case Nil => acc
+    case h :: tail if (!acc.contains(h) )=> _remove(tail,h :: acc) // append head to accumulator
+    case h :: tail if (acc.contains(h) )=> _remove( tail, acc) //recurese the accumulator til it find duplicate
+  }
+    _remove(xs,Nil)
+   //case head :: tail if contains(head, result) => remove(tail, result)
+ }
 
+  println("duplicates removed"+ remove(List(1,1,2,3,4,4,6,9,9,9,0,0,0,0,0,8,4,4,4,4,4,4,4,3,3,3,3,8,4,4,66,66,6,5)))
+  /**
+   *
+   * pack consecutive duplicates
+   *
+   * @param l
+   * @tparam A
+   * @return
+   */
   def pack[A](l: List[A]): List[List[A]] = {
     def _pack(res: List[List[A]], rem: List[A]): List[List[A]] = rem match {
       case Nil => res //accumulator list remain empty
       case x :: xs if (res.isEmpty || res.last.head != x) => _pack(res ::: List(List(x)), xs) //consecutive  elements are not same then populate a new accumlator list with head and tail
       case x :: xs => _pack(res.init ::: List(res.last ::: List(x)), xs) // opposite condition to above take the remaining -init and last and recurse
-
     }
-
     _pack(List(), l)
-
   }
 println("Consecutive element list" + pack(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
 
@@ -142,15 +216,88 @@ println("Consecutive element list" + pack(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, '
 
   def encode[A](xs: List[A]): List[(Int, A)] = xs match {
     case Nil => Nil
-    case x :: xs => encode(xs) match {
+    case x :: xs => encode(xs) match { //now pattern mach the xs to iterate over all the list elements one by one
 
       //case (c, `x`) :: rest => (c + 1, `x`) :: rest
+        //split xs to  tail as case class ((counter , value ) and append to rest of the list
       case (c, v) :: rest if v == x => (c + 1, x) :: rest
-      case             rest => (    1, x) :: rest
+      case             rest => (    1, x) :: rest // counter start
     }
   }
 
 
   println ("runlength encode" + encode (List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
-}
 
+  def encodemodified[A](xs: List[A]) : List[ (Int,A) ]= xs match {
+    case Nil => Nil
+    case x :: xs => encodemodified(xs) match {
+      case (c, v) :: rest if v == x => (c + 1, x) :: rest
+      case             rest => (    1, x) :: rest // counter start
+
+      //case (c, v) :: rest if c == 1 =>  List(x):: rest
+
+    }
+  }
+  println ("runlength encode" + encodemodified ( List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+
+  def encodeFunctional[A](ls: List[A]) = ls.foldRight(List[Tuple2[Int, A]]())(
+    (a, b) => b match {
+      case x :: xs if (x._2 == a) => (x._1 + 1, a) :: xs
+      case _       => (1, a) :: b
+    })
+  println ("runlength encode functional" + encodeFunctional ( List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+ val encodedval =encodeFunctional ( List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e))
+  import scala.collection.immutable.List._
+
+  def repeat[A](e: (Int, A)) = fill(e._1)(e._2)
+  def decode[A](rle: List[(Int, A)]) = rle flatMap repeat
+
+println( decode ( encodedval))
+
+  //duplicate the elements of the list
+
+  def duplicateE[A](l : List[A]): List[A] = l.flatMap( i =>  List(i,i))// create a new list with each element using flatMap function
+
+  println(duplicateE(encodedval))
+
+  //Duplicate the elements of a list a given number of times.
+
+  def duplcateN[A](i: Int,l:List[A]):List[A] = l.flatMap(x=>(1 to i).map(_=>x)) //create a list 1 to i then map the list with x
+   println(duplcateN ( 5, qlist))
+
+  //Drop every nth element in a List
+  def dropRec[A](n: Int, l: List[A]):List[A] = {
+    def _dropRec[A](c: Int, res: List[A], rem: List[A]):List[A] = (c, rem) match {
+      case (_, Nil) => res // empty list
+      case (1, _::tail) =>_dropRec(n, res, tail) // if it is the first element to be dropped, just return the tail
+      case (_, h::tail) => _dropRec(c-1, res:::List(h),tail) // count reducer counter -1 , input list + head and accumlate tail
+    }
+    _dropRec(n, List(), l)
+  }
+  println(qlist)
+  println(dropRec(4,qlist))
+
+  def split[A](n: Int, l: List[A]):(List[A], List[A]) = {
+    def _split[A](c: Int, res: List[A], rem: List[A]):(List[A],List[A]) = (c, rem) match {
+      case (_, Nil) => (res, Nil)//empty list
+      case (0, rem) => (res, rem) //counter is at 0
+      case (c, h::tail) => _split(c - 1, res:::(List(h)), tail) // keep extracting the head from rem appending it to
+                                                                // res until the counter is 0
+    }
+    _split(n, List(), l)
+  }
+
+  println(split(3,qlist))
+
+  def slice[A](i: Int, k: Int, l: List[A]):List[A] = {
+    def _slice[A](cl: Int, cr: Int, rem: List[A]): List[A] = (cl, cr, rem) match { //startindex //end index /rem
+      case (0, 0, rem) => rem
+      case (0, cr, rem) => _slice(0, cr - 1, rem.init)
+      case (cl, cr, rem) => _slice(cl - 1, cr, rem)
+
+    }
+    _slice(i,k-i,l)
+  }
+
+  println(slice(3,6, qlist))
+}
