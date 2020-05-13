@@ -20,7 +20,7 @@ object Listproblems  extends App {
   println(lastElement(qlist))
 
 
-  /**
+  /** 1
    *
    * Second last item from the list
    *
@@ -37,7 +37,7 @@ object Listproblems  extends App {
 
   println(secondLast(qlist))
 
-  /**
+  /** 2
    *
    * Find the Kth element at a list
    */
@@ -52,7 +52,7 @@ object Listproblems  extends App {
   }
   println(findKth(0, qlist))
 
-  /**
+  /** 3
    *
    * simple while loop
     * @param l
@@ -68,7 +68,7 @@ object Listproblems  extends App {
   println(listLoop(qlist))
 
 
-  /**
+  /** 4
    *
    * Lenght of the list
    * @tparam T
@@ -88,7 +88,7 @@ object Listproblems  extends App {
   println(qlist)
   println(length(qlist))
 
-  /**
+  /** 5
    * Reverse a list
    * @param l
    * @tparam A
@@ -102,7 +102,7 @@ object Listproblems  extends App {
   }
   println(reverseList(qlist))
 
-  /**
+  /** 6
    *
    * check is palindrome
    * @param l
@@ -118,7 +118,7 @@ object Listproblems  extends App {
   //H -TAI---------------------------L
   println(isPalindrome(List("M", "A", "L", "A", "Y", "A", "L", "A", "M")))
 
-  /***
+  /*** 7
    *
    * flatten the list
    * @param l
@@ -133,7 +133,7 @@ object Listproblems  extends App {
 
   println(flatten(List(List(1, 1), 2, List(3, List(5, 8)))))
 
-  /***
+  /*** 8
    * flattern another way
    * @param list
    * @tparam T
@@ -151,7 +151,7 @@ object Listproblems  extends App {
 
 
 
-  /***
+  /*** 9
    * Eliminate consecutive duplicates of list elements.
    *
    * @param list
@@ -178,7 +178,7 @@ object Listproblems  extends App {
 
   println(fcompress(List('a', 'a', 'a', 'a', 'b', 'c', 'c', 'a', 'a', 'd', 'e', 'e', 'e', 'e')))
 
-  /***
+  /***10
    *
    * Remove duplicates from a list
    */
@@ -193,7 +193,7 @@ object Listproblems  extends App {
  }
 
   println("duplicates removed"+ remove(List(1,1,2,3,4,4,6,9,9,9,0,0,0,0,0,8,4,4,4,4,4,4,4,3,3,3,3,8,4,4,66,66,6,5)))
-  /**
+  /** 11
    *
    * pack consecutive duplicates
    *
@@ -204,7 +204,9 @@ object Listproblems  extends App {
   def pack[A](l: List[A]): List[List[A]] = {
     def _pack(res: List[List[A]], rem: List[A]): List[List[A]] = rem match {
       case Nil => res //accumulator list remain empty
-      case x :: xs if (res.isEmpty || res.last.head != x) => _pack(res ::: List(List(x)), xs) //consecutive  elements are not same then populate a new accumlator list with head and tail
+      case x :: xs if (res.isEmpty || res.last.head != x) => _pack(res ::: List(List(x)), xs) //consecutive  elements are not same then populate
+                                     // a new accumlator list with head and tail (List(x:xs),List(x:xs),..., this will
+                                    //recusively continue until a consecutive matching item occur
       case x :: xs => _pack(res.init ::: List(res.last ::: List(x)), xs) // opposite condition to above take the remaining -init and last and recurse
     }
     _pack(List(), l)
@@ -212,22 +214,35 @@ object Listproblems  extends App {
 println("Consecutive element list" + pack(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
 
 
-  //run length encoding
-
+  /** 12
+   *
+   * run length encoding
+   *
+   * @param xs
+   * @tparam A
+   * @return
+   */
   def encode[A](xs: List[A]): List[(Int, A)] = xs match {
     case Nil => Nil
     case x :: xs => encode(xs) match { //now pattern mach the xs to iterate over all the list elements one by one
-
       //case (c, `x`) :: rest => (c + 1, `x`) :: rest
-        //split xs to  tail as case class ((counter , value ) and append to rest of the list
+        //patern match a case class with List of ((counter , value )  elements, if value equal to head value then increment and append to rest of the list
       case (c, v) :: rest if v == x => (c + 1, x) :: rest
-      case             rest => (    1, x) :: rest // counter start
+      case             rest => (    1, x) :: rest // counter reset for the next element in the parent list
     }
   }
 
 
   println ("runlength encode" + encode (List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
 
+  /**
+   *
+   *
+   * Run length modified
+   * @param xs
+   * @tparam A
+   * @return
+   */
   def encodemodified[A](xs: List[A]) : List[ (Int,A) ]= xs match {
     case Nil => Nil
     case x :: xs => encodemodified(xs) match {
@@ -238,7 +253,8 @@ println("Consecutive element list" + pack(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, '
 
     }
   }
-  println ("runlength encode" + encodemodified ( List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+  println ("run length encode" + encodemodified ( List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+
 
   def encodeFunctional[A](ls: List[A]) = ls.foldRight(List[Tuple2[Int, A]]())(
     (a, b) => b match {
@@ -252,20 +268,47 @@ println("Consecutive element list" + pack(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, '
   def repeat[A](e: (Int, A)) = fill(e._1)(e._2)
   def decode[A](rle: List[(Int, A)]) = rle flatMap repeat
 
-println( decode ( encodedval))
+  println( decode ( encodedval))
 
-  //duplicate the elements of the list
+  /** 13
+   * duplicate the elements of the list
+   *
+   *
+   * @param l
+   * @tparam A
+   * @return
+   */
+
 
   def duplicateE[A](l : List[A]): List[A] = l.flatMap( i =>  List(i,i))// create a new list with each element using flatMap function
 
   println(duplicateE(encodedval))
 
-  //Duplicate the elements of a list a given number of times.
+  /** 14
+   * Duplicate the elements of a list a given number of times.
+   *
+   * @param i
+   * @param l
+   * @tparam A
+   * @return
+   */
+  /*
+  first flatmap the list then create a range list inside flatmap and map to each element in the range with individual value
+
+   */
 
   def duplcateN[A](i: Int,l:List[A]):List[A] = l.flatMap(x=>(1 to i).map(_=>x)) //create a list 1 to i then map the list with x
    println(duplcateN ( 5, qlist))
 
-  //Drop every nth element in a List
+  /** 15
+   * Drop every nth element in a List
+   *
+   * @param n
+   * @param l
+   * @tparam A
+   * @return
+   */
+
   def dropRec[A](n: Int, l: List[A]):List[A] = {
     def _dropRec[A](c: Int, res: List[A], rem: List[A]):List[A] = (c, rem) match {
       case (_, Nil) => res // empty list
@@ -277,6 +320,14 @@ println( decode ( encodedval))
   println(qlist)
   println(dropRec(4,qlist))
 
+  /** 16
+   *
+   * Split list
+   * @param n
+   * @param l
+   * @tparam A
+   * @return
+   */
   def split[A](n: Int, l: List[A]):(List[A], List[A]) = {
     def _split[A](c: Int, res: List[A], rem: List[A]):(List[A],List[A]) = (c, rem) match {
       case (_, Nil) => (res, Nil)//empty list
@@ -289,6 +340,15 @@ println( decode ( encodedval))
 
   println(split(3,qlist))
 
+  /** 17
+   *
+   *
+   * @param i
+   * @param k
+   * @param l
+   * @tparam A
+   * @return
+   */
   def slice[A](i: Int, k: Int, l: List[A]):List[A] = {
     def _slice[A](cl: Int, cr: Int, rem: List[A]): List[A] = (cl, cr, rem) match { //startindex //end index /rem
       case (0, 0, rem) => rem
@@ -300,4 +360,26 @@ println( decode ( encodedval))
   }
 
   println(slice(3,6, qlist))
+
+
+  /***
+   *
+   * Remove kthe element
+   *
+   */
+
+  def removeAtR[A](n: Int, l: List[A]):(List[A], A) = {
+    def _removeAtR[A](k: Int, res: List[A], rem: List[A]):(List[A], A) = (k, rem) match {
+      case (0, h::tail) => return (res:::tail, h)
+      case (k, Nil) => throw new NoSuchElementException
+      case (k, h::tail) => return _removeAtR(k - 1, res:::List(h), tail)
+    }
+    return _removeAtR(n, List(), l)
+  }
+
+  println(removeAtR(3,qlist))
 }
+
+
+
+
